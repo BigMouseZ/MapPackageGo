@@ -1,7 +1,6 @@
 package main
 
 import (
-	"MapPackageGo/mapinit"
 	"fmt"
 	"github.com/beevik/etree"
 	_ "github.com/go-sql-driver/mysql"
@@ -9,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"MapPackageGo/mapinit"
 )
 
 func main() {
@@ -24,8 +25,15 @@ func main() {
 	if err != nil {
 		fmt.Printf("select fail [%s]", err)
 	}
+	exist, err := PathExists("./" + pak_name + ".pak")
+	if exist {
+		fmt.Println("删除存在文件：", "./"+pak_name+".pak")
+		os.Remove("./" + pak_name + ".pak")
+	}
 	pakFile, err := os.OpenFile("./"+pak_name+".pak", os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
 	doc := etree.NewDocument()
+	doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
+	doc.CreateProcInst("xml-stylesheet", `type="text/xsl" href="style.xsl"`)
 	root := doc.CreateElement("map")
 	var i = 0
 	for rows.Next() {
@@ -62,15 +70,39 @@ func main() {
 		ynode.CreateAttr("offset", strconv.FormatInt(n, 10))
 		ynode.CreateAttr("length", strconv.Itoa(len(Tile)))
 		pakFile.Write(Tile)
-		if i%10000 == 0 {
-			fmt.Println("打包进度：", i)
+		if i%1000 == 0 {
+			fmt.Println("当前时间 ：",string(time.Now().Format("2006-01-02 15:04:05")),"; 打包进度：",i,"; 级别:", Zoom)
 		}
 	}
 	fmt.Println("打包完成：", i)
+	existidx, err := PathExists("./" + pak_name + ".idx")
+	if existidx {
+		fmt.Println("删除存在文件：", "./"+pak_name+".idx")
+		os.Remove("./" + pak_name + ".idx")
+	}
 	idxFile, err := os.OpenFile("./"+pak_name+".idx", os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
 	doc.Indent(2)
 	doc.WriteTo(idxFile)
 	elapsed := time.Since(start)
 	fmt.Println("地图打包执行完！成耗时：秒", elapsed)
 	time.Sleep(time.Second * 2)
+}
+
+/*
+如果返回的错误为nil,说明文件或文件夹存在
+如果返回的错误类型使用os.IsNotExist()判断为true,说明文件或文件夹不存在
+如果返回的错误为其它类型,则不确定是否在存在
+*/
+func PathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		// 存在
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		// 不存在
+		return false, nil
+	}
+	// 不存在
+	return false, err
 }
