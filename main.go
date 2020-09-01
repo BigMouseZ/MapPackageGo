@@ -31,6 +31,7 @@ func main() {
 		os.Remove("./" + pak_name + ".pak")
 	}
 	pakFile, err := os.OpenFile("./"+pak_name+".pak", os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
+	defer pakFile.Close()
 	doc := etree.NewDocument()
 	doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
 	doc.CreateProcInst("xml-stylesheet", `type="text/xsl" href="style.xsl"`)
@@ -71,7 +72,7 @@ func main() {
 		ynode.CreateAttr("length", strconv.Itoa(len(Tile)))
 		pakFile.Write(Tile)
 		if i%1000 == 0 {
-			fmt.Println("当前时间 ：",string(time.Now().Format("2006-01-02 15:04:05")),"; 打包进度：",i,"; 级别:", Zoom)
+			fmt.Println("当前时间 ：", string(time.Now().Format("2006-01-02 15:04:05")), "; 打包进度：", i, "; 级别:", Zoom)
 		}
 	}
 	fmt.Println("打包完成：", i)
@@ -81,6 +82,7 @@ func main() {
 		os.Remove("./" + pak_name + ".idx")
 	}
 	idxFile, err := os.OpenFile("./"+pak_name+".idx", os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
+	defer idxFile.Close()
 	doc.Indent(2)
 	doc.WriteTo(idxFile)
 	elapsed := time.Since(start)
