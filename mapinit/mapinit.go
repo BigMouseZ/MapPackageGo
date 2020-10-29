@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 var Config map[string]string
@@ -71,10 +72,12 @@ var (
 func Dbinit() *sql.DB {
 	dbUrl := Config["datasource_url"]
 	var err error
-	DbInit,err := sql.Open("mysql",dbUrl)
-	if err != nil{
-		panic("连接数据库失败:" + err.Error())
-	}else{
+	DbInit, err := sql.Open("mysql", dbUrl)
+	if err != nil {
+		fmt.Println("连接数据库失败:" + err.Error())
+		time.Sleep(time.Second * 2)
+		panic("连接数据库失败,退出程序:" + err.Error())
+	} else {
 		fmt.Println("connect to mysql success")
 	}
 
