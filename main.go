@@ -75,7 +75,7 @@ func main() {
 			fmt.Println("当前时间 ：", string(time.Now().Format("2006-01-02 15:04:05")), "; 打包进度：", i, "; 级别:", Zoom)
 		}
 	}
-	fmt.Println("打包完成：", i)
+	fmt.Println("打包完成总瓦块数：", i)
 	existidx, err := PathExists("./" + pak_name + ".idx")
 	if existidx {
 		fmt.Println("删除存在文件：", "./"+pak_name+".idx")
@@ -86,7 +86,7 @@ func main() {
 	doc.Indent(2)
 	doc.WriteTo(idxFile)
 	elapsed := time.Since(start)
-	fmt.Println("地图打包执行完！成耗时：", elapsed)
+	fmt.Println("地图打包执行完成!耗时：", elapsed)
 	time.Sleep(time.Second * 2)
 }
 
