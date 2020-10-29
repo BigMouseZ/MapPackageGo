@@ -86,7 +86,7 @@ func main() {
 	doc.Indent(2)
 	doc.WriteTo(idxFile)
 	elapsed := time.Since(start)
-	fmt.Println("地图打包执行完！成耗时：秒", elapsed)
+	fmt.Println("地图打包执行完！成耗时：", elapsed)
 	time.Sleep(time.Second * 2)
 }
 
